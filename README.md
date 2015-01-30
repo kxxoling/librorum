@@ -1,9 +1,16 @@
-#基于 Redis 的自动补全
+#Librorum——基于 Redis 的索引/搜索引擎
 灵感来自于 [autocomplete-redis](https://github.com/fengli/autocomplete-redis)
 
 [![Code Health](https://landscape.io/github/kxxoling/librorum/master/landscape.svg)](https://landscape.io/github/kxxoling/librorum/master)
 [![Build Status](https://travis-ci.org/kxxoling/librorum.svg)](https://travis-ci.org/kxxoling/librorum)
 
-##TODO
-* 自定义字段名
-* 自定义结构&结构化搜索
+## 名称由来
+> 肚子饿了…
+> ——by Index-Librorum-Prohibitorum
+
+## TODO
+* 自定义索引字段
+* 更加灵活的结构配置
+* 更强大的搜索功能
+* 减少索引数量
+* 类似 [Whoosh](https://bitbucket.org/mchaput/whoosh/wiki/Home) 的接口
