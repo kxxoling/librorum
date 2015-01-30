@@ -52,6 +52,12 @@ class TestEngine(unittest.TestCase):
         assert item2nd['uid'] in self.lib.retrieve('北京大', **kwargs2)
         assert item2nd['uid'] in self.lib.retrieve('北京大学', **kwargs2)
 
+    def test_search(self):
+        result = self.lib.search('beijing')
+        assert len(result) == 1
+        for item in result:
+            assert item['uid'] in [33]
+
 
 if __name__ == '__main__':
     unittest.main()

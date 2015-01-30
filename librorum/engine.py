@@ -22,11 +22,12 @@ class Librorum(object):
 
     def search(self, term, limit=-1):
         """先将中文分词再转换成拼音，根据分词和拼音匹配索引"""
+        term = ''.join(lazy_pinyin(term))
         result = self.retrieve(term, limit)
+
         if result is []:
-            term = ''.join(lazy_pinyin())
-            result = self.retrieve(term, limit)
-        return result
+            return []
+        return map(json.loads, self.redis.hmget(self.database, *result))
 
     def retrieve(self, word, limit=-1, **kwargs):
         """根据字符串匹配索引"""
