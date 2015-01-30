@@ -21,7 +21,7 @@ class Librorum(object):
             raise Exception('structure 中不可存在保留字（%s）！' % str(self.RESERVED_WORDS))
 
     def search(self, term, limit=-1):
-        """先将中文分词再转换成拼音，根据分词和拼音匹配索引"""
+        """根据 retrieve 的结果从数据库中取值"""
         term = ''.join(lazy_pinyin(term))
         result = self.retrieve(term, limit)
 
@@ -32,8 +32,14 @@ class Librorum(object):
     def retrieve(self, word, limit=-1, **kwargs):
         """根据字符串匹配索引"""
         word = word.lower()
-        rtv_key = "%s_%s"%(self.indexbase, word)
-        self.redis.zinterstore(rtv_key, [rtv_key] + self.dbs(kwargs))
+        words = filter(lambda x: x and True or False, word.split(' '))
+
+        rtv_key = "%s_%s" % (self.indexbase, word)
+        rtv_keys = map(lambda word: "%s_%s"%(self.indexbase, word), words)
+        rtv_keys.extend(self.dbs(kwargs))
+
+        self.redis.zinterstore(rtv_key, rtv_keys)
+
         return map(int, self.redis.zrevrange(rtv_key, 0, limit))
 
     def add_item(self, item):
@@ -73,6 +79,7 @@ class Librorum(object):
 
     def index(self, uid, term, score=None):
         """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
+        term = term.lower()
         if score is None:
             self.redis.sadd('%s_%s'%(self.indexbase, term), uid)
         else:
