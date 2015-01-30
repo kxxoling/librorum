@@ -14,7 +14,7 @@ class TestEngine(unittest.TestCase):
         self.items = [
             dict(uid=1, term=u'清华大学', t=1),
             dict(uid=33, term=u'北京大学', t=0, n=4),
-            dict(uid=23, term=u'QsingHua Univ', t=1, n=4),
+            dict(uid=23, term=u'QsingHua大学', t=1, n=4),
             dict(uid=13, term=u'Peiking Univ', t=0, n=4),
         ]
         for item in self.items:
@@ -45,6 +45,9 @@ class TestEngine(unittest.TestCase):
         assert item2['uid'] not in self.lib.retrieve('清华', **kwargs)
         assert item2['uid'] not in self.lib.retrieve('清华大', **kwargs)
         assert item2['uid'] not in self.lib.retrieve('qhdx', **kwargs)
+
+        assert item3['uid'] in self.lib.retrieve('Qsinghua', **kwargs)
+        assert item3['uid'] in self.lib.retrieve('qsing daxue', **kwargs)
 
         kwargs2 = dict(t=0)
         assert item2['uid'] in self.lib.retrieve('bj', **kwargs2)
