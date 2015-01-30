@@ -3,6 +3,9 @@ python:
   - "2.6"
   - "2.7"
 
+services:
+  - redis-server
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
