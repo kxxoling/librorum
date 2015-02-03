@@ -59,8 +59,9 @@ class Librorum(object):
         """先分词再索引"""
         if uid is None:
             uid = term['uid']
-        words = jieba.cut_for_search(term)
+        words = jieba.cut_for_search(term, HMM=True)
         map(lambda s: self.index_cn_word(uid, s), words)
+        self.index_cn_word(uid, term, base_score=5)
 
     def index_cn_word(self, uid, cn_word, base_score=0):
         """以中文词为单位，不再分词"""
@@ -68,14 +69,15 @@ class Librorum(object):
         pinyin = ''.join(pinpin_words)
         py = ''.join(map(lambda x: x[0], pinpin_words))
 
-        self.index_word(uid, cn_word, score=base_score+3)
-        self.index_word(uid, pinyin, score=base_score+2)
-        self.index_word(uid, py, score=base_score+1)
+        self.index_word(uid, cn_word, score=base_score*3)
+        self.index_word(uid, pinyin, score=base_score*2)
+        self.index_word(uid, py, score=base_score*1)
 
-    def index_word(self, uid, word, **kwargs):
+    def index_word(self, uid, word, score=1):
         """索引单词和词语"""
-        for i in range(1, len(word)+1):
-            self.index(uid, word[:i], **kwargs)
+        for i in range(1, len(word)):
+            self.index(uid, word[:i], score=1)
+        self.index(uid, word, score=score)
 
     def index(self, uid, term, score=None):
         """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
