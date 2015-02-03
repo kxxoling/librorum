@@ -78,6 +78,14 @@ class TestEngine(unittest.TestCase):
         for item in result:
             assert item['uid'] in [item2['uid'], item5['uid'], item6['uid']]
 
+    def test_flush(self):
+        assert self.lib.redis.exists(self.lib.database) is True
+        self.lib.flush()
+
+        assert len(self.lib.retrieve('b')) is 0
+        assert len(self.lib.retrieve('q')) is 0
+        assert self.lib.redis.exists(self.lib.database) is False
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -106,9 +106,9 @@ class Librorum(object):
                     dbs.append('%s_%s=%s' % (self.indexbase, k, item[k]))
         return dbs
 
-    def del_index(self):
+    def flush(self):
         """暂未实现"""
-        prefixs = self.redis.smembers(self.indexbase)
+        prefixs = self.redis.keys('%s*' % self.indexbase)
         for prefix in prefixs:
             self.redis.delete(prefix)
         self.redis.delete(self.database)
