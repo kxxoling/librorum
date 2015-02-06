@@ -28,7 +28,7 @@ class Librorum(object):
 
         if result is []:
             return []
-        return map(json.loads, self.redis.hmget(self.database, *result)[1:])
+        return map(json.loads, self.redis.hmget(self.database, *result))
 
     def retrieve(self, word, limit=0, **kwargs):
         """根据字符串匹配索引"""

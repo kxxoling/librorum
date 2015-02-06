@@ -99,6 +99,7 @@ class TestEngine(unittest.TestCase):
         assert len(beijing_result) <= LIMIT
         b_result = self.lib.retrieve('b', limit=LIMIT)
         assert len(b_result) <= LIMIT
+        assert item7['uid'] is self.lib.search(u'baidu')[0]['uid']
 
         beijing_result = self.lib.retrieve('beijing', limit=LIMIT)
         assert len(beijing_result) <= LIMIT
