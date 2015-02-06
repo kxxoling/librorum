@@ -20,7 +20,7 @@ class Librorum(object):
         if structure is not None and self.RESERVED_WORDS.intersection(structure.keys()):
             raise Exception('structure 中不可存在保留字（%s）！' % str(self.RESERVED_WORDS))
 
-    def search(self, term, limit=-1):
+    def search(self, term, limit=0):
         """根据 retrieve 的结果从数据库中取值"""
         term = ''.join(lazy_pinyin(term))
         result = self.retrieve(term, limit)
@@ -29,7 +29,7 @@ class Librorum(object):
             return []
         return map(json.loads, self.redis.hmget(self.database, *result)[1:])
 
-    def retrieve(self, word, limit=-1, **kwargs):
+    def retrieve(self, word, limit=0, **kwargs):
         """根据字符串匹配索引"""
         word = word.lower()
         words = filter(lambda x: x and True or False, word.split(' '))
@@ -40,7 +40,7 @@ class Librorum(object):
 
         self.redis.zinterstore(rtv_key, rtv_keys)
 
-        return map(int, self.redis.zrevrange(rtv_key, 0, limit))
+        return map(int, self.redis.zrevrange(rtv_key, 0, limit-1))
 
     def add_item(self, item):
         """

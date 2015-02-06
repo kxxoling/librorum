@@ -18,6 +18,8 @@ items = [
 
 item, item2, item3, item4, item5, item6, item7, item8, item9 = items
 
+LIMIT = 3
+
 
 class TestEngine(unittest.TestCase):
     def setUp(self):
@@ -73,10 +75,29 @@ class TestEngine(unittest.TestCase):
         assert item7['uid'] is self.lib.retrieve(u'baidu')[0]
         assert item7['uid'] is self.lib.retrieve(u'百度')[0]
 
+
+        b_result = self.lib.retrieve('b', limit=LIMIT)
+        assert len(b_result) <= LIMIT
+
+        beijing_result = self.lib.retrieve('beijing', limit=LIMIT)
+        assert len(beijing_result) <= LIMIT
+
     def test_search(self):
         result = self.lib.search(u'beijing')
         for item in result:
             assert item['uid'] in [item2['uid'], item5['uid'], item6['uid']]
+
+        b_result = self.lib.search('b', limit=LIMIT)
+        assert len(b_result) <= LIMIT
+
+        beijing_result = self.lib.search('北京', limit=LIMIT)
+        print beijing_result
+        assert len(beijing_result) <= LIMIT
+        b_result = self.lib.retrieve('b', limit=LIMIT)
+        assert len(b_result) <= LIMIT
+
+        beijing_result = self.lib.retrieve('beijing', limit=LIMIT)
+        assert len(beijing_result) <= LIMIT
 
     def test_flush(self):
         assert self.lib.redis.exists(self.lib.database) is True
