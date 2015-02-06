@@ -4,6 +4,7 @@ import unittest
 import redis
 from engine import Librorum
 
+
 items = [
     dict(uid=1, term=u'清华大学', t=1),
     dict(uid=2, term=u'北京大学', t=0, n=4),
@@ -13,10 +14,11 @@ items = [
     dict(uid=6, term=u'北京大学医学部', t=0, n=4),
     dict(uid=7, term=u'百度', t=0, n=4),
     dict(uid=8, term=u'百度投资', t=0, n=4),
-    dict(uid=9, term=u'百度金融机构', t=0, n=4),
+    dict(uid=9, term=u'成都百度金融机构', t=0, n=4),
+    dict(uid=10, term=u'成都百度', t=0, n=4),
 ]
 
-item, item2, item3, item4, item5, item6, item7, item8, item9 = items
+item, item2, item3, item4, item5, item6, item7, item8, item9, item10 = items
 
 LIMIT = 3
 
@@ -27,6 +29,7 @@ class TestEngine(unittest.TestCase):
         structure = dict(t=int, n=int)
         self.structure = structure
         self.lib = Librorum(r, structure=structure)
+        self.lib.flush()
         for item in items:
             self.lib.add_item(item)
 
@@ -74,6 +77,8 @@ class TestEngine(unittest.TestCase):
 
         assert item7['uid'] is self.lib.retrieve(u'baidu')[0]
         assert item7['uid'] is self.lib.retrieve(u'百度')[0]
+        assert item8['uid'] is self.lib.retrieve(u'百度')[1] or item10['uid'] is self.lib.retrieve(u'百度')[1]
+        assert item9['uid'] is self.lib.retrieve(u'百度')[3]
 
 
         b_result = self.lib.retrieve('b', limit=LIMIT)
@@ -91,7 +96,6 @@ class TestEngine(unittest.TestCase):
         assert len(b_result) <= LIMIT
 
         beijing_result = self.lib.search('北京', limit=LIMIT)
-        print beijing_result
         assert len(beijing_result) <= LIMIT
         b_result = self.lib.retrieve('b', limit=LIMIT)
         assert len(b_result) <= LIMIT

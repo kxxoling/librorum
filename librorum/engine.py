@@ -9,7 +9,7 @@ class Librorum(object):
     """doc here"""
     RESERVED_WORDS = set(('db', 'idx', 'uid', 'term', 'limit'))       # 索引保留字，数据结构中禁止使用
 
-    def __init__(self, redis_conn, engine_name=None, structure=None, cached=False):
+    def __init__(self, redis_conn, engine_name=None, structure=None, cached=False, base_score=1):
         self.cached = cached
         if engine_name is None:
             engine_name = ''
@@ -17,6 +17,7 @@ class Librorum(object):
         self.database = '%s_db' % engine_name
         self.indexbase = '%s_idx' % engine_name
         self.redis = redis_conn
+        self.base_score = base_score
         if structure is not None and self.RESERVED_WORDS.intersection(structure.keys()):
             raise Exception('structure 中不可存在保留字（%s）！' % str(self.RESERVED_WORDS))
 
@@ -40,7 +41,7 @@ class Librorum(object):
 
         self.redis.zinterstore(rtv_key, rtv_keys)
 
-        return map(int, self.redis.zrevrange(rtv_key, 0, limit-1))
+        return map(int, self.redis.zrange(rtv_key, 0, limit-1))
 
     def add_item(self, item):
         """
@@ -59,24 +60,27 @@ class Librorum(object):
         """先分词再索引"""
         if uid is None:
             uid = term['uid']
-        words = jieba.cut_for_search(term, HMM=True)
-        map(lambda s: self.index_cn_word(uid, s), words)
-        self.index_cn_word(uid, term, base_score=5)
+        words = list(jieba.cut_for_search(term, HMM=True))
+        length = len(words)
+        map(lambda s: self.index_cn_word(uid, s, base_score=self.base_score*length), words)
+        self.index_cn_word(uid, term, base_score=self.base_score)
 
-    def index_cn_word(self, uid, cn_word, base_score=0):
+    def index_cn_word(self, uid, cn_word, base_score=None):
         """以中文词为单位，不再分词"""
         pinpin_words = lazy_pinyin(cn_word, NORMAL)
         pinyin = ''.join(pinpin_words)
         py = ''.join(map(lambda x: x[0], pinpin_words))
+        if base_score is None:
+            base_score = self.base_score
 
-        self.index_word(uid, cn_word, score=base_score*3)
+        self.index_word(uid, cn_word, score=base_score)
         self.index_word(uid, pinyin, score=base_score*2)
-        self.index_word(uid, py, score=base_score*1)
+        self.index_word(uid, py, score=base_score*3)
 
     def index_word(self, uid, word, score=1):
         """索引单词和词语"""
         for i in range(1, len(word)):
-            self.index(uid, word[:i], score=1)
+            self.index(uid, word[:i], score=score*2)
         self.index(uid, word, score=score)
 
     def index(self, uid, term, score=None):
