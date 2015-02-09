@@ -16,9 +16,11 @@ items = [
     dict(uid=8, term=u'百度投资', t=0, n=4),
     dict(uid=9, term=u'成都百度金融机构', t=0, n=4),
     dict(uid=10, term=u'成都百度', t=0, n=4),
+    dict(uid=11, term=u'北戴河岸', t=0, n=4),
+    dict(uid=12, term=u'北大青鸟', t=0, n=4),
 ]
 
-item, item2, item3, item4, item5, item6, item7, item8, item9, item10 = items
+item, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12 = items
 
 LIMIT = 3
 
@@ -80,6 +82,9 @@ class TestEngine(unittest.TestCase):
         assert item8['uid'] is self.lib.retrieve(u'百度')[1] or item10['uid'] is self.lib.retrieve(u'百度')[1]
         assert item9['uid'] is self.lib.retrieve(u'百度')[3]
 
+        # 略有瑕疵，稍后在重构版本中加入取最高权重功能
+        assert item11['uid'] in self.lib.retrieve(u'beida')
+        assert item12['uid'] in self.lib.retrieve(u'beida')
 
         b_result = self.lib.retrieve('b', limit=LIMIT)
         assert len(b_result) <= LIMIT

@@ -79,9 +79,9 @@ class Librorum(object):
 
     def index_word(self, uid, word, score=1):
         """索引单词和词语"""
-        for i in range(1, len(word)):
-            self.index(uid, word[:i], score=score*2)
-        self.index(uid, word, score=score)
+        length = len(word)
+        for i in range(1, length+1):
+            self.index(uid, word[:i], score=score*length/i)
 
     def index(self, uid, term, score=None):
         """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
