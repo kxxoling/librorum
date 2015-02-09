@@ -25,7 +25,7 @@ LIMIT = 3
 
 class TestEngine(unittest.TestCase):
     def setUp(self):
-        r = redis.Redis()
+        r = redis.StrictRedis()
         structure = dict(t=int, n=int)
         self.structure = structure
         self.lib = Librorum(r, structure=structure)

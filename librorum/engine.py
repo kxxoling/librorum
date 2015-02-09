@@ -89,7 +89,7 @@ class Librorum(object):
         if score is None:
             self.redis.sadd('%s_%s'%(self.indexbase, term), uid)
         else:
-            self.redis.zadd('%s_%s'%(self.indexbase, term), uid, score)
+            self.redis.zadd('%s_%s'%(self.indexbase, term), **{str(uid):score})
 
     def store(self, item, uid=None):
         if not uid:

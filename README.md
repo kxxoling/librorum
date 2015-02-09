@@ -7,13 +7,13 @@
 
 
 ## 名称由来
+
 > 肚子饿了…
 > ——by Index-Librorum-Prohibitorum
 
 
 ## TODO
 
-* StrictRedis 支持
 * Python3 支持（需要等 jieba 对 Python3 的支持稳定后）
 * 分页
 * 自定义索引字段
