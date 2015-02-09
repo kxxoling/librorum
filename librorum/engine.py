@@ -60,7 +60,11 @@ class Librorum(object):
         """先分词再索引"""
         if uid is None:
             uid = term['uid']
-        words = list(jieba.cut_for_search(term, HMM=True))
+        terms = term.split(' ')
+        words = set()
+        for t in terms:
+            words = words.union(list(jieba.cut_for_search(t, HMM=True)))
+
         length = len(words)
         map(lambda s: self.index_cn_word(uid, s, base_score=self.base_score*length), words)
         self.index_cn_word(uid, term, base_score=self.base_score)

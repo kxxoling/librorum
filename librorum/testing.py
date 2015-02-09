@@ -61,6 +61,8 @@ class TestEngine(unittest.TestCase):
         assert item2['uid'] not in self.lib.retrieve(u'qhdx', **kwargs)
 
         assert item3['uid'] in self.lib.retrieve(u'Qsinghua', **kwargs)
+        assert item3['uid'] in self.lib.retrieve(u'qsing', **kwargs)
+        assert item3['uid'] in self.lib.retrieve(u'daxue', **kwargs)
         assert item3['uid'] in self.lib.retrieve(u'qsing daxue', **kwargs)
 
         kwargs2 = dict(t=0)
