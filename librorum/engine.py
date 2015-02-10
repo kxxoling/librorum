@@ -26,7 +26,7 @@ class Librorum(object):
         term = ''.join(lazy_pinyin(term))
         result = self.retrieve(term, limit)
 
-        if result is []:
+        if len(result) is 0:
             return []
         return map(json.loads, self.redis.hmget(self.database, *result))
 
