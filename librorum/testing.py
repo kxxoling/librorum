@@ -2,7 +2,7 @@
 #coding:utf-8
 import unittest
 import redis
-from engine import Librorum
+from engine import Librorum, get_indexes, split_cn_word, split_word, merge_dicts_by_weight
 
 
 items = [
@@ -23,6 +23,28 @@ items = [
 item, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12 = items
 
 LIMIT = 3
+
+
+class TestUtilities(unittest.TestCase):
+    def setUp(self):
+        r = redis.StrictRedis()
+        structure = dict(t=int, n=int)
+        self.structure = structure
+
+    def tearDown(self):
+        pass
+
+    def test_split_word(self):
+        pass
+
+    def test_split_cn_word(self):
+        pass
+
+    def test_merge_dicts_by_weight(self):
+        pass
+
+    def test_get_indexes(self):
+        pass
 
 
 class TestEngine(unittest.TestCase):

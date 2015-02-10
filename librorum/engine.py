@@ -54,46 +54,13 @@ class Librorum(object):
         if term is None:
             return
         self.store(item, uid)
-        self.index_term(term, uid)
+        self.index(term, uid)
 
-    def index_term(self, term, uid=None):
-        """先分词再索引"""
-        if uid is None:
-            uid = term['uid']
-        terms = term.split(' ')
-        words = set()
-        for t in terms:
-            words = words.union(list(jieba.cut_for_search(t, HMM=True)))
-
-        length = len(words)
-        map(lambda s: self.index_cn_word(uid, s, base_score=self.base_score*length), words)
-        self.index_cn_word(uid, term, base_score=self.base_score)
-
-    def index_cn_word(self, uid, cn_word, base_score=None):
-        """以中文词为单位，不再分词"""
-        pinpin_words = lazy_pinyin(cn_word, NORMAL)
-        pinyin = ''.join(pinpin_words)
-        py = ''.join(map(lambda x: x[0], pinpin_words))
-        if base_score is None:
-            base_score = self.base_score
-
-        self.index_word(uid, cn_word, score=base_score)
-        self.index_word(uid, pinyin, score=base_score*2)
-        self.index_word(uid, py, score=base_score*3)
-
-    def index_word(self, uid, word, score=1):
-        """索引单词和词语"""
-        length = len(word)
-        for i in range(1, length+1):
-            self.index(uid, word[:i], score=score*length/i)
-
-    def index(self, uid, term, score=None):
+    def index(self, term, uid, score=1):
         """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
         term = term.lower()
-        if score is None:
-            self.redis.sadd('%s_%s'%(self.indexbase, term), uid)
-        else:
-            self.redis.zadd('%s_%s'%(self.indexbase, term), **{str(uid):score})
+        map(lambda (index, weight): self.redis.zadd('%s_%s'%(self.indexbase, index), **{str(uid): weight*score}),
+            get_indexes(term).iteritems())
 
     def store(self, item, uid=None):
         if not uid:
@@ -124,3 +91,37 @@ class Librorum(object):
 
     def del_item(self, uid):
         pass
+
+
+def get_indexes(term):
+    cn_words = term.split(' ')
+    words_length = len(cn_words)
+    return merge_dicts_by_weight(map(split_cn_word, cn_words))
+
+
+def split_cn_word(cn_word):
+    word_len = len(cn_word)
+    pinyin_word = lazy_pinyin(cn_word, NORMAL)
+    pinyin = ''.join(pinyin_word)
+    py = ''.join(map(lambda x: x[0], pinyin_word))
+    return multi(word_len)(merge_dicts_by_weight(map(split_word, (cn_word, pinyin, py))))
+
+
+def split_word(word):
+    word_len = len(word)
+    _ = {}
+    for i in range(1, word_len):
+        _[word[:i]] = word_len/i
+    return _
+
+
+def merge_dicts_by_weight(dicts):
+    return dicts[0]
+
+
+def multi(num):
+    def func(item):
+        for k in item:
+            item[k] *= num
+        return item
+    return func
