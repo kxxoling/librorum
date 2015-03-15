@@ -34,17 +34,39 @@ class TestUtilities(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_split_word(self):
-        pass
-
-    def test_split_cn_word(self):
-        pass
-
     def test_merge_dicts_by_weight(self):
         pass
 
-    def test_get_indexes(self):
+    def test_split_word(self):
+        self.assertIn(u'大学', split_word(u'大学').keys())
+        self.assertIn(u'清华大学', split_word(u'清华大学').keys())
         pass
+
+    def test_split_cn_word(self):
+        term = u'清华大学'
+        indexes = split_cn_word(term).keys()
+        self.assertIn(term, indexes)
+        self.assertIn(u'清华大', indexes)
+
+        baidu_dict = split_cn_word(u'百度')
+        self.assertLess(baidu_dict[u'百度'], baidu_dict[u'baidu'])
+
+    def test_get_indexes(self):
+        term = items[0]['term']
+        indexes = get_indexes(term).keys()
+        self.assertIn(u'清华', indexes)
+        self.assertIn(u'清华大学', indexes)
+        self.assertIn(u'清华大', indexes)
+        self.assertIn(u'qinghua', indexes)
+        self.assertIn(u'qhd', indexes)
+        self.assertIn(u'qh', indexes)
+        self.assertIn(u'qhdx', indexes)
+        self.assertIn(u'大学', indexes)
+        self.assertIn(u'daxue', indexes)
+
+        baidu_indexes = get_indexes(u'百度')
+        self.assertLess(baidu_indexes[u'百度'], baidu_indexes[u'baidu'])
+        self.assertLess(baidu_indexes[u'baidu'], baidu_indexes[u'bd'])
 
 
 class TestEngine(unittest.TestCase):
@@ -59,11 +81,6 @@ class TestEngine(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-    def test_dbs(self):
-        assert '_idx_t=1' in self.lib.dbs(items[0])
-        assert '_idx_t=0' in self.lib.dbs(items[1])
-        assert '_idx_n=4' in self.lib.dbs(items[1])
 
     def test_retrieve(self):
 

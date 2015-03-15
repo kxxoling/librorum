@@ -59,8 +59,16 @@ class Librorum(object):
     def index(self, term, uid, score=1):
         """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
         term = term.lower()
-        map(lambda (index, weight): self.redis.zadd('%s_%s'%(self.indexbase, index), **{str(uid): weight*score}),
-            get_indexes(term).iteritems())
+
+        for k, v in get_indexes(term).iteritems():
+            self._index(k, v, uid, score)
+
+    def _index(self, term, weight, uid, score):
+        if weight in (0, None):
+            pass
+        else:
+            self.redis.zadd('%s_%s'%(self.indexbase, term),
+                            **{str(uid): weight*score})
 
     def store(self, item, uid=None):
         if not uid:
@@ -94,29 +102,55 @@ class Librorum(object):
 
 
 def get_indexes(term):
+    """ 对给定短语进行分词、拼音化等操作，获取其所有可能索引
+    """
     cn_words = term.split(' ')
-    words_length = len(cn_words)
-    return merge_dicts_by_weight(map(split_cn_word, cn_words))
+    _ = []
+    for word in cn_words:
+        _.extend(jieba.cut_for_search(word, HMM=True))
+    _ = list(set(_))
+
+    words_count = len(_)
+
+    words_indexes = multi(words_count)(merge_dicts_by_weight(map(split_cn_word, _)))
+    return merge_dicts_by_weight([words_indexes, {''.join(cn_words): 1}])
 
 
 def split_cn_word(cn_word):
-    word_len = len(cn_word)
+    """ 获取中文词语所有补全形式，进行拼音、分词等操作，但不包括各种索引。
+    """
     pinyin_word = lazy_pinyin(cn_word, NORMAL)
     pinyin = ''.join(pinyin_word)
     py = ''.join(map(lambda x: x[0], pinyin_word))
-    return multi(word_len)(merge_dicts_by_weight(map(split_word, (cn_word, pinyin, py))))
+
+    word_indexes = split_word(cn_word)
+    pinyin_indexes = multi(2)(split_word(pinyin))
+    py_indexes = multi(3)(split_word(py))
+
+    return merge_dicts_by_weight([word_indexes, pinyin_indexes, py_indexes])
 
 
 def split_word(word):
+    """ 获取英文字词所有补全形式，不包括各种索引，不进行拼音、分词等操作。
+    """
     word_len = len(word)
     _ = {}
-    for i in range(1, word_len):
+    for i in range(1, word_len+1):
         _[word[:i]] = word_len/i
+
     return _
 
 
 def merge_dicts_by_weight(dicts):
-    return dicts[0]
+    """ 合并多个权重字典，取最高权重
+    """
+    _ = {}
+    for d in dicts:
+        for k in d:
+            existing_value = _.get(k)
+            if existing_value is None or existing_value > d[k]:
+                _[k] = d[k]
+    return _
 
 
 def multi(num):
