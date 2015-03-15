@@ -26,21 +26,18 @@ LIMIT = 3
 
 
 class TestUtilities(unittest.TestCase):
-    def setUp(self):
-        r = redis.StrictRedis()
-        structure = dict(t=int, n=int)
-        self.structure = structure
-
-    def tearDown(self):
-        pass
 
     def test_merge_dicts_by_weight(self):
-        pass
+        dict1 = dict(k1=2, k3=5, k2=4)
+        dict2 = dict(k1=0, k3=5, k2=8)
+        merged_dict = merge_dicts_by_weight([dict1, dict2])
+        for k, v in merged_dict.iteritems():
+            self.assertLessEqual(v, dict1.get(k, 0))
+            self.assertLessEqual(v, dict2.get(k, 0))
 
     def test_split_word(self):
         self.assertIn(u'大学', split_word(u'大学').keys())
         self.assertIn(u'清华大学', split_word(u'清华大学').keys())
-        pass
 
     def test_split_cn_word(self):
         term = u'清华大学'
