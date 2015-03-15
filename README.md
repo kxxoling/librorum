@@ -9,7 +9,8 @@
 ## 名称由来
 
 > 肚子饿了…
-> ——by Index-Librorum-Prohibitorum
+>
+> —— by Index ‧ Librorum ‧ Prohibitorum
 
 
 ## TODO
