@@ -138,8 +138,6 @@ class TestEngine(unittest.TestCase):
     def test_retrieve_offset(self):
         limit = 3
         for term in ['a', 'b', 'q']:
-            result_count = len(self.lib.retrieve(term, limit=0))
-
             merged_list = self.lib.retrieve(term, limit, offset=0)
             merged_list.extend(self.lib.retrieve(term, limit=0, offset=limit))
             self.assertSequenceEqual(merged_list, self.lib.retrieve(term, limit=0, offset=0))
