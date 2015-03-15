@@ -130,6 +130,11 @@ class TestEngine(unittest.TestCase):
         beijing_result = self.lib.retrieve('beijing', limit=LIMIT)
         assert len(beijing_result) <= LIMIT
 
+    def test_retrieve_limit(self):
+        limit = 3
+        for term in ['a', 'b', 'q']:
+            self.assertGreaterEqual(limit, len(self.lib.retrieve(term, limit)))
+
     def test_search(self):
         result = self.lib.search(u'beijing')
         for item in result:
