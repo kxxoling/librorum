@@ -9,16 +9,20 @@ class Librorum(object):
     """doc here"""
     RESERVED_WORDS = set(('db', 'idx', 'uid', 'term', 'limit'))       # 索引保留字，数据结构中禁止使用
 
-    def __init__(self, redis_conn, engine_name=None, structure=None, cached=False, base_score=1):
-        self.cached = cached
-        if engine_name is None:
-            engine_name = ''
-        self.structure = structure
-        self.database = '%s_db' % engine_name
-        self.indexbase = '%s_idx' % engine_name
+    def __init__(self, redis_conn, **kwargs):
+        self.config = dict(
+            engine_name='',
+            structure=dict(),
+            cached=False,
+            base_score=1,
+        )
+        self.config.update(kwargs)
+
+        self.database = '%s_db' % self.config['engine_name']
+        self.indexbase = '%s_idx' % self.config['engine_name']
         self.redis = redis_conn
-        self.base_score = base_score
-        if structure is not None and self.RESERVED_WORDS.intersection(structure.keys()):
+
+        if self.RESERVED_WORDS.intersection(self.config['structure'].keys()):
             raise Exception('structure 中不可存在保留字（%s）！' % str(self.RESERVED_WORDS))
 
     def search(self, term, limit=0):
@@ -82,11 +86,12 @@ class Librorum(object):
 
     def dbs(self, item):
         dbs = []
-        if self.structure is not None:
-            for k in self.structure:
-                v = item.get(k)
-                if v is not None:
-                    dbs.append('%s_%s=%s' % (self.indexbase, k, item[k]))
+
+        for k in self.config['structure']:
+            v = item.get(k)
+            if v is not None:
+                dbs.append('%s_%s=%s' % (self.indexbase, k, item[k]))
+
         return dbs
 
     def flush(self):
