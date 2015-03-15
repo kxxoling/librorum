@@ -135,6 +135,15 @@ class TestEngine(unittest.TestCase):
         for term in ['a', 'b', 'q']:
             self.assertGreaterEqual(limit, len(self.lib.retrieve(term, limit)))
 
+    def test_retrieve_offset(self):
+        limit = 3
+        for term in ['a', 'b', 'q']:
+            result_count = len(self.lib.retrieve(term, limit=0))
+
+            merged_list = self.lib.retrieve(term, limit, offset=0)
+            merged_list.extend(self.lib.retrieve(term, limit=0, offset=limit))
+            self.assertSequenceEqual(merged_list, self.lib.retrieve(term, limit=0, offset=0))
+
     def test_search(self):
         result = self.lib.search(u'beijing')
         for item in result:
