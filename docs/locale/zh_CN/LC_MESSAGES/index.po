@@ -1,0 +1,52 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Librorum 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-19 12:48+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../index.rst:7
+msgid "Welcome to Librorum's documentation!"
+msgstr ""
+
+#: ../../index.rst:9
+msgid "Contents:"
+msgstr ""
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum:1
+msgid ""
+"A search engine for phrase autocompletition and searching engine based on "
+"Redis"
+msgstr ""
+"一个基于 Redis 的自动补全/搜索引擎"
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum.add_item:1
+msgid ""
+"Add new item to database. Item excepted as dict type. Steps: 1. Save the "
+"item to database 2. Word segementation by blank and Jieba for Chinese 3. "
+"Save the indexes to indexbase"
+msgstr ""
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum.flush:1
+msgid "Clean all the keys used by Librorum"
+msgstr "删除所有 Librorom 所创建的 key"
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum.index:1
+msgid "Index term and uid with base score"
+msgstr "索引 term 和 uid，并根据基础权重设置索引权重"
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum.retrieve:1
+msgid "Get uid list by word, args are the same as self.search"
+msgstr "获取 uid 列表，参数设置与 self.search 一致"
+
+#: ../../../librorum/__init__.pydocstring of librorum.Librorum.search:1
+msgid ""
+"Get the result from database, accepted args are: term: word for searching "
+"limit: how many results you need offset: the offset of searching result"
+msgstr ""
