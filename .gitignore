@@ -1,0 +1,14 @@
+*.pyc
+*.swp
+*.mo
+*~
+
+.DS_Store
+.idea
+Icon?
+Thumbs.db
+ehthumbs.db
+
+_book
+_site
+_build
