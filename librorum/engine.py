@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding:utf-8
+# coding: utf-8
 import json
 from pypinyin import lazy_pinyin, NORMAL
 import jieba
@@ -45,7 +44,7 @@ class Librorum(object):
         words = filter(lambda x: x and True or False, word.split(' '))
 
         rtv_key = "%s_%s" % (self.indexbase, word)
-        rtv_keys = map(lambda word: "%s_%s"%(self.indexbase, word), words)
+        rtv_keys = map(lambda word: "%s_%s" % (self.indexbase, word), words)
         rtv_keys.extend(self.dbs(kwargs))
 
         self.redis.zinterstore(rtv_key, rtv_keys)
@@ -77,7 +76,7 @@ class Librorum(object):
         if weight in (0, None):
             pass
         else:
-            self.redis.zadd('%s_%s'%(self.indexbase, term),
+            self.redis.zadd('%s_%s' % (self.indexbase, term),
                             **{str(uid): weight*score})
 
     def store(self, item, uid=None):

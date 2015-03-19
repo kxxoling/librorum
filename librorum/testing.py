@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding:utf-8
+# coding: utf-8
 import unittest
 import redis
 from engine import Librorum, get_indexes, split_cn_word, split_word, merge_dicts_by_weight
