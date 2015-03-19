@@ -1,3 +1,4 @@
 redis
 jieba
 pypinyin
+sphinx_rtd_theme
