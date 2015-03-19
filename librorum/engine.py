@@ -6,8 +6,9 @@ import jieba
 
 
 class Librorum(object):
-    """doc here"""
-    RESERVED_WORDS = set(('db', 'idx', 'uid', 'term', 'limit'))       # 索引保留字，数据结构中禁止使用
+    """ A search engine for phrase autocompletition and searching engine based on Redis
+    """
+    RESERVED_WORDS = set(('db', 'idx', 'uid', 'term', 'limit'))       # Reserved word by now
 
     def __init__(self, redis_conn, **kwargs):
         self.config = dict(
@@ -26,7 +27,11 @@ class Librorum(object):
             raise Exception('structure 中不可存在保留字（%s）！' % str(self.RESERVED_WORDS))
 
     def search(self, term, **kwargs):
-        """根据 retrieve 的结果从数据库中取值"""
+        """ Get the result from database, accepted args are:
+        term: word for searching
+        limit: how many results you need
+        offset: the offset of searching result
+        """
         term = ''.join(lazy_pinyin(term))
         result = self.retrieve(term, **kwargs)
 
@@ -35,7 +40,7 @@ class Librorum(object):
         return map(json.loads, self.redis.hmget(self.database, *result))
 
     def retrieve(self, word, limit=0, offset=0, **kwargs):
-        """根据字符串匹配索引"""
+        """ Get uid list by word, args are the same as self.search """
         word = word.lower()
         words = filter(lambda x: x and True or False, word.split(' '))
 
@@ -48,10 +53,10 @@ class Librorum(object):
         return map(int, self.redis.zrange(rtv_key, offset, limit-1))
 
     def add_item(self, item):
-        """
-        1. 将item 信息存储在 database 中
-        2. 将 term 分词
-        3. 将分词以不同的权重存储在 indexbase 中
+        """ Add new item to database. Item excepted as dict type. Steps:
+        1. Save the item to database
+        2. Word segementation by blank and Jieba for Chinese
+        3. Save the indexes to indexbase
         """
         uid = item['uid']
         term = item.get('term')
@@ -61,7 +66,8 @@ class Librorum(object):
         self.index(term, uid)
 
     def index(self, term, uid, score=1):
-        """索引一个字符串，如果传入 score 参数，则存为 zset，否则存为 set"""
+        """ Index term and uid with base score
+        """
         term = term.lower()
 
         for k, v in get_indexes(term).iteritems():
@@ -95,7 +101,7 @@ class Librorum(object):
         return dbs
 
     def flush(self):
-        """暂未实现"""
+        """ Clean all the keys used by Librorum """
         prefixs = self.redis.keys('%s*' % self.indexbase)
         for prefix in prefixs:
             self.redis.delete(prefix)
@@ -107,8 +113,7 @@ class Librorum(object):
 
 
 def get_indexes(term):
-    """ 对给定短语进行分词、拼音化等操作，获取其所有可能索引
-    """
+    """ Get all the indexes of `term` """
     cn_words = term.split(' ')
     _ = []
     for word in cn_words:
@@ -122,8 +127,7 @@ def get_indexes(term):
 
 
 def split_cn_word(cn_word):
-    """ 获取中文词语所有补全形式，进行拼音、分词等操作，但不包括各种索引。
-    """
+    """ Get all the index-weight pairs of a Chinese word """
     pinyin_word = lazy_pinyin(cn_word, NORMAL)
     pinyin = ''.join(pinyin_word)
     py = ''.join(map(lambda x: x[0], pinyin_word))
@@ -136,7 +140,7 @@ def split_cn_word(cn_word):
 
 
 def split_word(word):
-    """ 获取英文字词所有补全形式，不包括各种索引，不进行拼音、分词等操作。
+    """ Get all the index-weight pairs of a word
     """
     word_len = len(word)
     _ = {}
@@ -147,8 +151,7 @@ def split_word(word):
 
 
 def merge_dicts_by_weight(dicts):
-    """ 合并多个权重字典，取最高权重
-    """
+    """ Merge dicts by the lowest weight """
     _ = {}
     for d in dicts:
         for k in d:
