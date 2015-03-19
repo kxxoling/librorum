@@ -50,6 +50,9 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
+update:
+	sphinx-intl update -p _build/locale -l en -l zh_CN
+
 html:
 	$(SPHINXBUILD) -b html $(ENSPHINXOPTS) $(BUILDDIR)/html
 	@echo
