@@ -44,7 +44,7 @@ class Librorum(object):
         words = filter(lambda x: x and True or False, word.split(' '))
 
         rtv_key = "%s_%s" % (self.indexbase, word)
-        rtv_keys = map(lambda word: "%s_%s" % (self.indexbase, word), words)
+        rtv_keys = list(map(lambda word: "%s_%s" % (self.indexbase, word), words))
         rtv_keys.extend(self.dbs(kwargs))
 
         self.redis.zinterstore(rtv_key, rtv_keys)
