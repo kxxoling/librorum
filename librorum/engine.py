@@ -36,7 +36,7 @@ class Librorum(object):
 
         if len(result) is 0:
             return []
-        return map(json.loads, self.redis.hmget(self.database, *result))
+        return list(map(json.loads, self.redis.hmget(self.database, *result)))
 
     def retrieve(self, word, limit=0, offset=0, **kwargs):
         """ Get uid list by word, args are the same as self.search """
@@ -49,7 +49,7 @@ class Librorum(object):
 
         self.redis.zinterstore(rtv_key, rtv_keys)
 
-        return map(int, self.redis.zrange(rtv_key, offset, limit-1))
+        return list(map(int, self.redis.zrange(rtv_key, offset, limit-1)))
 
     def add_item(self, item):
         """ Add new item to database. Item excepted as dict type. Steps:
