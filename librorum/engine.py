@@ -69,7 +69,7 @@ class Librorum(object):
         """
         term = term.lower()
 
-        for k, v in get_indexes(term).iteritems():
+        for k, v in get_indexes(term).items():
             self._index(k, v, uid, score)
 
     def _index(self, term, weight, uid, score):

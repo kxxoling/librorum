@@ -30,7 +30,7 @@ class TestUtilities(unittest.TestCase):
         dict1 = dict(k1=2, k3=5, k2=4)
         dict2 = dict(k1=0, k3=5, k2=8)
         merged_dict = merge_dicts_by_weight([dict1, dict2])
-        for k in iter(merged_dict):
+        for k, v in merged_dict.items():
             self.assertLessEqual(merged_dict[k], dict1.get(k, 0))
             self.assertLessEqual(merged_dict[k], dict2.get(k, 0))
 
