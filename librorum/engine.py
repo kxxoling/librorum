@@ -36,7 +36,8 @@ class Librorum(object):
 
         if len(result) is 0:
             return []
-        return list(map(json.loads, self.redis.hmget(self.database, *result)))
+        return list(map(lambda s: json.loads(s.decode()),
+                        self.redis.hmget(self.database, *result)))
 
     def retrieve(self, word, limit=0, offset=0, **kwargs):
         """ Get uid list by word, args are the same as self.search """
